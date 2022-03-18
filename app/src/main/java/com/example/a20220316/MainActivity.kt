@@ -2,14 +2,20 @@ package com.example.a20220316
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Environment
 import android.provider.ContactsContract
 import android.provider.MediaStore
+import androidx.core.content.FileProvider
 import com.example.a20220316.databinding.ActivityMainBinding
+import java.io.File
 import java.lang.Exception
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -18,6 +24,26 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+//        //파일만들기
+//        val timeStamp : String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+//        val storageDir : File? = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+//        val file = File.createTempFile(
+//            "JPEG_${timeStamp}_",
+//            ".jpg",
+//            storageDir
+//        )
+//
+//        val filePath  = file.absolutePath
+//        val photoURI: Uri = FileProvider.getUriForFile(
+//            this,
+//            "com.example.a20220316.fileprovider" , file
+//        )
+//        val option = BitmapFactory.Options()
+//        option.inSampleSize = 10
+//        val bitmap = BitmapFactory.decodeFile(filePath,option)
+//        bitmap?.let {
+//            binding.imageview1.setImageBitmap(bitmap)
+//        }
         //주소록
         binding.btn1.setOnClickListener {
             startActivity(Intent(Intent.ACTION_PICK,ContactsContract.CommonDataKinds.Phone.CONTENT_URI))
@@ -29,12 +55,33 @@ class MainActivity : AppCompatActivity() {
         }
         //카메라
         binding.btn3.setOnClickListener {
-            startActivityForResult(Intent(MediaStore.ACTION_IMAGE_CAPTURE),10)
+            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            startActivityForResult(intent , 10)
         }
+        //지도 앱
+        binding.btn4.setOnClickListener {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("geo:37.5662952,126.9779451"))
+            startActivity(intent)
+        }
+        //전화
+        binding.btn5.setOnClickListener {
+            val intent = Intent(Intent.ACTION_CALL,Uri.parse("tel:01-123"))
+            startActivity(intent)
+        }
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+
+        //사진 정보 받아오기
+        if(requestCode == 10 && resultCode == Activity.RESULT_OK){
+//            //사진 데이터 가져오기
+             val bitmap = data?.getExtras()?.get("data") as Bitmap
+            binding.imageview1.setImageBitmap(bitmap)
+
+
+        }
         //주소록 정보 받아오기
         if(requestCode == 20 && resultCode == Activity.RESULT_OK){
 
